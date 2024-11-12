@@ -48,19 +48,27 @@ class Colocviu1_1MainActivity : AppCompatActivity() {
             input2.setText(rightNumber.toString())
         }
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
+        val activityResultsLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                Toast.makeText(this, "Ai apasat REGISTER", Toast.LENGTH_LONG).show()
+            }
+            else if (result.resultCode == Activity.RESULT_CANCELED) {
+                Toast.makeText(this, "Ai apasat CANCEL", Toast.LENGTH_LONG).show()
+                input1.setText("0")
+                input2.setText("0")
+            }
         }
-    }
 
-    val activityResultsLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            Toast.makeText(this, "The activity returned with result OK", Toast.LENGTH_LONG).show()
+        val navigateToSecondaryActivityButton = findViewById<Button>(R.id.navigate_to_second_activity)
+        navigateToSecondaryActivityButton.setOnClickListener {
+            val intent = Intent(this, Colocviu1_1SecondaryActivity::class.java)
+            intent.putExtra(INPUT1, Integer.valueOf(input1.text.toString()))
+            intent.putExtra(INPUT2, Integer.valueOf(input2.text.toString()))
+            activityResultsLauncher.launch(intent)
         }
-        else if (result.resultCode == Activity.RESULT_CANCELED) {
-            Toast.makeText(this, "The activity returned with result CANCELED", Toast.LENGTH_LONG).show()
+
+        Constants.actionTypes.forEach { action ->
+            intentFilter.addAction(action)
         }
     }
 
